@@ -1,5 +1,7 @@
 import numpy as np
 import keras
+import tensorflow as tf
+import cv2
 
 
 def compute_iou(boxes_a, boxes_b):
@@ -116,6 +118,30 @@ def anchor_targets_bbox(
             # argmax_overlaps_inds: id of ground truth box has greatest overlap with anchor
             # (N, ), (N, ), (N, ) N is num_anchors
             positive_indices, ignore_indices, argmax_overlaps_inds = compute_gt_annotations(anchors, annotations['bboxes'], negative_overlap, positive_overlap)
+
+            # mean = [0.485, 0.456, 0.406]
+            # std = [0.229, 0.224, 0.225]
+            # image = image * std + mean
+            # gt_bboxes = annotations['bboxes'][argmax_overlaps_inds]
+            # w, h, _ = image.shape
+            # for gt_box in gt_bboxes:
+            #     gtx1 = int(gt_box[0])
+            #     gty1 = int(gt_box[1])
+            #     gtx2 = int(gt_box[2])
+            #     gty2 = int(gt_box[3])
+            #     cv2.rectangle(image, (gtx1, gty1), (gtx2, gty2), (0, 0, 255), 1)
+            #
+            # pos_label = annotations['labels'][argmax_overlaps_inds[positive_indices]]
+            # pos_anchor = anchors[positive_indices]
+            # for box, label in zip(pos_anchor, pos_label):
+            #     bx1 = max(box[0], 0)
+            #     by1 = max(box[1], 0)
+            #     bx2 = min(box[2], w)
+            #     by2 = min(box[3], h)
+            #     cv2.rectangle(image, (bx1, by1), (bx2, by2), (255, 0, 0), 1)
+            #     cv2.putText(image, str(label), (bx1, by1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0))
+            # cv2.imshow('img', image)
+            # cv2.waitKey(0)
 
             labels_batch[index, ignore_indices, -1] = -1
             labels_batch[index, positive_indices, -1] = 1

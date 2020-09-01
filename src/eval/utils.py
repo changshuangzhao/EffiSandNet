@@ -320,5 +320,5 @@ if __name__ == '__main__':
     num_anchors = val_generator.num_anchors
 
     model, prediction_model = efficientdet(num_anchors, num_classes, num_properties, cfg.w_bifpn, cfg.d_bifpn, cfg.d_head, score_threshold=0.01, nms_threshold=0.5)
-    prediction_model.load_weights('../train/checkpoints/csv_212_1.1373_1.5797.h5', by_name=True)
+    # prediction_model.load_weights('../train/checkpoints/csv_212_1.1373_1.5797.h5', by_name=True)
     evaluate(generator=val_generator, model=prediction_model, iou_threshold=0.5, score_threshold=0.25)

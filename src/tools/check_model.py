@@ -41,6 +41,36 @@ def preprocess_image(image, image_size):
 
 
 if __name__ == '__main__':
+    import keras
+    import numpy as np
+    import cv2
+
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../generators'))
+    from generator import CSVGenerator
+
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../networks'))
+    from efficientdet import efficientdet
+
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../configs'))
+    from config import cfg
+
+    def _bce(y_true, y_pred):
+        pro_target = y_true[:, :, :-1]
+        anchor_state = y_true[:, :, -1]
+        pro = y_pred
+
+        indices = tf.where(keras.backend.equal(anchor_state, 1))
+        pro = tf.gather_nd(pro, indices)
+        pro_target = tf.gather_nd(pro_target, indices)
+
+        # pro_loss = keras.losses.categorical_crossentropy(pro_target, pro, from_logits=True)
+        # pro_loss = keras.losses.binary_crossentropy(pro_target, pro, from_logits=True)
+        pro_loss = keras.backend.categorical_crossentropy(pro_target, pro, from_logits=False)
+        # pro_loss = keras.backend.binary_crossentropy(pro_target, pro, from_logits=True)
+        normalizer = keras.backend.maximum(1, keras.backend.shape(indices)[0])
+        normalizer = keras.backend.cast(normalizer, dtype=keras.backend.floatx())
+        return keras.backend.sum(pro_loss) / normalizer
+
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     K.set_session(tf.Session(config=config))
@@ -54,27 +84,31 @@ if __name__ == '__main__':
     num_anchors = val_generator.num_anchors
 
     model, prediction_model = efficientdet(num_anchors, num_classes, num_properties, cfg.w_bifpn, cfg.d_bifpn, cfg.d_head, score_threshold=0.01, nms_threshold=0.5)
-    model.load_weights('../train/checkpoints/csv_212_1.1373_1.5797.h5', by_name=True)
+    model.load_weights('../train/csv_72_1.4165_1.5192.h5', by_name=True)
 
-    with open('../generators/convert_data/val.csv', 'r') as f:
-        img_infos = f.readlines()
-    root = os.path.expanduser('~/data')
-    for img_info in img_infos:
-        img_info_split = img_info.strip('\n').split(',')
-        img_name = img_info_split[0]
-        # img_box = img_info_split[1:5]
-        # img_clas = img_info_split[5]
-        # img_pro = img_info_split[6]
+    # anno reg, cls, pro
+    for image, anno in val_generator:
+        # print(anno)
+        reg, cls, pro = model.predict_on_batch(image)
 
-        img_path = os.path.join(root, img_name)
-        image = cv2.imread(img_path)
+        reg_anchor_state = anno[0][:, :, -1]
+        reg_indices = tf.where(keras.backend.equal(reg_anchor_state, 1))
+        pos_reg = tf.gather_nd(reg, reg_indices)
+        pos_tar_reg = tf.gather_nd(anno[0][:, :, :-1], reg_indices)
 
-        src_image = image.copy()
-        # BGR -> RGB
-        image = image[:, :, ::-1]
-        h, w = image.shape[:2]
+        cls_anchor_state = anno[1][:, :, -1]
+        cls_indices = tf.where(keras.backend.not_equal(cls_anchor_state, -1))
+        no_ign_labels = tf.gather_nd(cls, cls_indices)
+        no_ign_tar_labels = tf.gather_nd(anno[1][:, :, :-1], cls_indices)
 
-        image_size = 896
-        image, scale = preprocess_image(image, image_size=image_size)
-        reg, cls, pro = model.predict_on_batch([np.expand_dims(image, axis=0)])
-        print(reg)
+        pro_anchor_state = anno[2][:, :, -1]
+        pro_indices = tf.where(keras.backend.equal(pro_anchor_state, 1))
+        pos_pro = tf.gather_nd(pro, pro_indices)
+        pos_tar_pro = tf.gather_nd(anno[2][:, :, :-1], pro_indices)
+        # print()
+        # print(reg.shape)
+        # print(cls.shape)
+        # print(pro.shape)
+        # exit()
+        # _bce(anno[2], pro)
+

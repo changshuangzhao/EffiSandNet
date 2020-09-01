@@ -24,14 +24,14 @@ def main():
     K.set_learning_phase(0)
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-    model_path = '../train/checkpoints/2020-08-31/ep07-loss2.0928-val_loss197.8533.h5'
+    model_path = '../train/csv_15_1.7055_2.4735.h5'
     image_size = 896
 
     classes = {0: 'sand'}
     properties = {0: 'yes', 1: 'no', 2: 'unrecognized'}
     num_classes = 1
     num_properties = 3
-    score_threshold = 0.3
+    score_threshold = 0.25
     colors = [np.random.randint(0, 256, 3).tolist() for _ in range(num_classes)]
 
     model, prediction_model = efficientdet(9, 1, 3, 64, 3, 3, 0.3, 0.5)
@@ -43,7 +43,7 @@ def main():
                                 anchor_params=anchor_params)
 
     # for image_path in glob.glob('/Users/yanyan/data/SandCar/images/*.jpg'):
-    with open('../generators/convert_data/val.csv', 'r') as f:
+    with open('/Users/yanyan/Pictures/data_txt/val_3.csv', 'r') as f:
         img_infos = f.readlines()
     root = os.path.expanduser('~/data')
     for img_info in img_infos:
