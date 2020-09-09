@@ -29,22 +29,29 @@ def preprocess_image(image, image_size):
     return image, scale
 
 
-root = '/Users/yanyan/data/标注图片/'
+root = '/Users/yanyan/data'
 properties = ['yes', 'no', 'unrecognized']
-with open('car_0.txt', 'r') as f:
+with open('total_data.txt', 'r') as f:
     img_lines = f.readlines()
+
 save_path = '/Users/yanyan/data/plot_img_0'
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 
 min_bbox_w = 100000
 min_bbox_h = 100000
+
+yes = 0
+no = 0
+un = 0
 for img_line in img_lines:
     img_info = img_line.strip('\n').split('\t')
     img_path = img_info[0]
 
     img_boxes = img_info[1:]
+
     img = cv2.imread(root + img_path)
+
     for img_box in img_boxes:
         box = list(map(int, img_box.split(',')[:-2]))
         # 求取gt中最小的宽，高
@@ -60,12 +67,16 @@ for img_line in img_lines:
         # print('h = ', box[3] - box[1])
         # cls = img_box.split(',')[-2]
         pro = img_box.split(',')[-1]
-        # print(img_path)
-        # print(box)
-        # print((box[0], box[1]), (box[2], box[3]))
-        cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 1)
-        string = properties[int(pro)]
-        cv2.putText(img, string, (box[0], box[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+        if pro == '0':
+            yes += 1
+        elif pro == '1':
+            no += 1
+        else:
+            un += 1
+
+        # cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 1)
+        # string = properties[int(pro)]
+        # cv2.putText(img, string, (box[0], box[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
 
         # img_copy = img.copy()
         # img_resize, scale = preprocess_image(img_copy, 768)
@@ -90,11 +101,14 @@ for img_line in img_lines:
         # string = properties[int(pro)]
         # cv2.putText(upsample_32_img, string, (upsample_32_box[0], upsample_32_box[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
-    print(os.path.join(save_path, os.path.basename(img_path)))
-    cv2.imwrite(os.path.join(save_path, os.path.basename(img_path)), img)
+    # print(os.path.join(save_path, os.path.basename(img_path)))
+    # cv2.imwrite(os.path.join(save_path, os.path.basename(img_path)), img)
     # cv2.imshow('img', img)
     # cv2.imshow('resize img', img_resize)
     # cv2.imshow('upsample_32_box', upsample_32_img)
 
-    if cv2.waitKey() == 27:
-        exit()
+    # if cv2.waitKey() == 27:
+    #     exit()
+print(yes)
+print(no)
+print(un)

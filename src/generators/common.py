@@ -143,7 +143,6 @@ class Generator(keras.utils.Sequence):
         #  'bboxes': array([[1022.,  567., 1778., 1080.],[ 769.,  408., 1002.,  699.]]),
         #  'quadrangles': array([], shape=(0, 4, 2), dtype=float32)},]
         annotations_group = [self.load_annotations(image_index) for image_index in group]
-
         for annotations in annotations_group:
             assert (isinstance(annotations, dict)), '\'load_annotations\' should return a list of dictionaries, received: {}'.format(type(annotations))
             assert ('labels' in annotations), '\'load_annotations\' should return a list of dictionaries that contain \'labels\' and \'bboxes\'.'
@@ -478,6 +477,7 @@ class Generator(keras.utils.Sequence):
         std = [0.229, 0.224, 0.225]
         image -= mean
         image /= std
+
         pad_h = self.image_size - resized_height
         pad_w = self.image_size - resized_width
         image = np.pad(image, [(0, pad_h), (0, pad_w), (0, 0)], mode='constant')

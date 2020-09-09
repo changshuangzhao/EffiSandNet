@@ -6,7 +6,8 @@ cfg.InputSize_w = 896
 cfg.InputSize_h = 896
 
 cfg.DataRoot = '/Users/yanyan/data'
-cfg.TrainData = '../generators/convert_data/val.csv'
+# cfg.DataRoot = '/wdc/changshuang/data'
+cfg.TrainData = '../generators/convert_data/train.csv'
 cfg.ValData = '../generators/convert_data/val.csv'
 cfg.Cls = '../generators/convert_data/cls.csv'
 cfg.Pro = '../generators/convert_data/pro.csv'

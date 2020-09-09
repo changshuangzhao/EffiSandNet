@@ -55,7 +55,7 @@ def ConvBlock(num_channels, kernel_size, strides, name, freeze_bn=False):
     return reduce(lambda f, g: lambda *args, **kwargs: g(f(*args, **kwargs)), (f1, f2, f3))
 
 
-def build_wBiFPN(features, num_channels, id):
+def build_wBiFPN(features, num_channels, id, freeze_bn=False):
     if id == 0:
         _, _, C3, C4, C5 = features
         P3_in = C3

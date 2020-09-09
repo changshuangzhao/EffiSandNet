@@ -285,9 +285,14 @@ def evaluate(
         # compute average precision
         average_precision = _compute_ap(recall, precision)
         average_precisions[label] = average_precision, num_annotations
+        if (num_tp + num_fp) == 0:
+            p = 0
+        else:
+            p = num_tp / (num_tp + num_fp)
+        r = num_tp / num_annotations
     print('num_fp={}, num_tp={}'.format(num_fp, num_tp))
 
-    return average_precisions
+    return average_precisions, p, r
 
 
 if __name__ == '__main__':
@@ -298,6 +303,7 @@ if __name__ == '__main__':
     import time
     import numpy as np
     import cv2
+    import matplotlib.pyplot as plt
 
     sys.path.append(os.path.join(os.path.dirname(__file__), '../generators'))
     from generator import CSVGenerator
@@ -314,11 +320,15 @@ if __name__ == '__main__':
     val_generator = CSVGenerator(base_dir=cfg.DataRoot, data_file=cfg.ValData, class_file=cfg.Cls,
                                  property_file=cfg.Pro,
                                  batch_size=1, image_sizes=cfg.InputSize_w, shuffle_groups=False)
-
-    num_classes = val_generator.num_classes()
-    num_properties = val_generator.num_properties()
-    num_anchors = val_generator.num_anchors
-
-    model, prediction_model = efficientdet(num_anchors, num_classes, num_properties, cfg.w_bifpn, cfg.d_bifpn, cfg.d_head, score_threshold=0.01, nms_threshold=0.5)
-    # prediction_model.load_weights('../train/checkpoints/csv_212_1.1373_1.5797.h5', by_name=True)
-    evaluate(generator=val_generator, model=prediction_model, iou_threshold=0.5, score_threshold=0.25)
+    # print(val_generator.size())
+    print(val_generator.anchors.shape[0])
+    exit()
+    for input, tar in val_generator:
+        pass
+    # num_classes = val_generator.num_classes()
+    # num_properties = val_generator.num_properties()
+    # num_anchors = val_generator.num_anchors
+    #
+    # model, prediction_model = efficientdet(num_anchors, num_classes, num_properties, cfg.w_bifpn, cfg.d_bifpn, cfg.d_head, score_threshold=0.01, nms_threshold=0.5)
+    # # prediction_model.load_weights('../train/checkpoints/csv_212_1.1373_1.5797.h5', by_name=True)
+    # evaluate(generator=val_generator, model=prediction_model, iou_threshold=0.5, score_threshold=0.25)

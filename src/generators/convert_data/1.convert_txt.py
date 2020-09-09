@@ -6,8 +6,10 @@ car_class = ['小轿车', '面包车', '货车', '小卡车', '大卡车', 'SUV'
 car_property = ['苫盖', '未苫盖', '无法判断']
 bbox_class = ['sand']
 bbox_property = ['yes', 'no', 'unrecognized']
-img_root = os.path.expanduser('~/data/SandCar/images')
-anno_root = os.path.expanduser('~/data/SandCar/annotations')
+# img_root = os.path.expanduser('~/data/SandCar/images')
+# anno_root = os.path.expanduser('~/data/SandCar/annotations')
+img_root = os.path.expanduser('~/data')
+anno_root = os.path.expanduser('~/data/object_detection/annotations')
 anno_files = os.listdir(anno_root)
 
 
@@ -16,7 +18,7 @@ for anno_file in anno_files:
     if '.DS_Store' in anno_file:
         continue
     anno_path = os.path.join(anno_root, anno_file)
-    print(anno_path)
+    # print(anno_path)
     with open(anno_path, 'r', encoding='utf8') as f:
         json_data = json.load(f)
         # 当前图像的路径信息
@@ -50,12 +52,10 @@ for anno_file in anno_files:
                     data_dict[img_path] = [[left, top, right, bottom, bbox_class[0], bbox_property[bbox_property_index]]]
                 else:
                     data_dict[img_path].append([left, top, right, bottom, bbox_class[0], bbox_property[bbox_property_index]])
+print('图片数量', len(data_dict))
 
 
-val_csv = open('val.csv', 'w')
-train_csv = open('train.csv', 'w')
-
-index = 0
+data_list = []
 for key, values in data_dict.items():
     for value in values:
         left = value[0]
@@ -64,15 +64,62 @@ for key, values in data_dict.items():
         bottom = value[3]
         cls = value[4]
         pro = value[5]
-        img_path = os.path.join('SandCar/images', key)
+        img_path = os.path.join('object_detection/images', key)
         bbox_info = img_path + ',' + ','.join(list(map(str, [left, top, right, bottom]))) + ',' + cls + ',' + pro
-        if index <= len(data_dict) * 0.1:
-            val_csv.write(bbox_info + '\n')
-        else:
-            train_csv.write(bbox_info + '\n')
-    index += 1
-train_csv.close()
-val_csv.close()
+        data_list.append(bbox_info)
+
+
+random.shuffle(data_list)
+data_len = len(data_list)
+val_csv_0 = open('val_cross0.csv', 'w')
+train_csv_0 = open('train_cross0.csv', 'w')
+val_csv_1 = open('val_cross1.csv', 'w')
+train_csv_1 = open('train_cross1.csv', 'w')
+val_csv_2 = open('val_cross2.csv', 'w')
+train_csv_2 = open('train_cross2.csv', 'w')
+val_csv_3 = open('val_cross3.csv', 'w')
+train_csv_3 = open('train_cross3.csv', 'w')
+val_csv_4 = open('val_cross4.csv', 'w')
+train_csv_4 = open('train_cross4.csv', 'w')
+
+for i, value in enumerate(data_list):
+    if i < 294:
+        val_csv_0.write(value + '\n')
+    else:
+        train_csv_0.write(value + '\n')
+
+for i, value in enumerate(data_list):
+    if i < 294:
+        train_csv_1.write(value + '\n')
+    elif i < 587:
+        val_csv_1.write(value + '\n')
+    else:
+        train_csv_1.write(value + '\n')
+
+for i, value in enumerate(data_list):
+    if i < 587:
+        train_csv_2.write(value + '\n')
+    elif i < 879:
+        val_csv_2.write(value + '\n')
+    else:
+        train_csv_2.write(value + '\n')
+
+for i, value in enumerate(data_list):
+    if i < 879:
+        train_csv_3.write(value + '\n')
+    elif i < 1173:
+        val_csv_3.write(value + '\n')
+    else:
+        train_csv_3.write(value + '\n')
+
+for i, value in enumerate(data_list):
+    if i < 1173:
+        train_csv_4.write(value + '\n')
+    elif i < 1466:
+        val_csv_4.write(value + '\n')
+    else:
+        train_csv_4.write(value + '\n')
+
 
 with open('cls.csv', 'w') as class_csv:
     class_csv.write('sand,0')

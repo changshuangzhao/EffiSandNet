@@ -21,7 +21,7 @@ def create_callbacks(prediction_model, validation_generator):
     tensorboard_callback = TensorBoard(log_dir='logs/{}'.format(today))
     callbacks.append(tensorboard_callback)
 
-    evaluation = Evaluate(validation_generator, prediction_model, tensorboard=tensorboard_callback, score_threshold=0.25)
+    evaluation = Evaluate(validation_generator, prediction_model, tensorboard=tensorboard_callback, score_threshold=0.5)
     callbacks.append(evaluation)
 
     makedirs('checkpoints/{}'.format(today))

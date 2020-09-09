@@ -1,0 +1,2 @@
+truck,9973
+total_imgs,6127

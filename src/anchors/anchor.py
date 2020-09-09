@@ -63,6 +63,11 @@ AnchorParameters.default = AnchorParameters(
     scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)], keras.backend.floatx()),
 )
 
+# pos_0 = 0
+# pos_1 = 0
+# pos_2 = 0
+# pos_3 = 0
+# pos_4 = 0
 
 def anchor_targets_bbox(
         anchors,
@@ -112,12 +117,24 @@ def anchor_targets_bbox(
     properties_batch = np.zeros((batch_size, anchors.shape[0], num_properties + 1), dtype=np.float32)
 
     # compute labels and regression targets
+    # pos_0 = 0
+    # pos_1 = 0
+    # pos_2 = 0
+    # pos_3 = 0
+    # pos_4 = 0
     for index, (image, annotations) in enumerate(zip(image_group, annotations_group)):
+        # print(index)
         if annotations['bboxes'].shape[0]:
             # obtain indices of gt annotations with the greatest overlap
             # argmax_overlaps_inds: id of ground truth box has greatest overlap with anchor
             # (N, ), (N, ), (N, ) N is num_anchors
             positive_indices, ignore_indices, argmax_overlaps_inds = compute_gt_annotations(anchors, annotations['bboxes'], negative_overlap, positive_overlap)
+            # 112896 28224 7056 1764 441 == 150381
+            # pos_0 += sum(positive_indices[:112896])
+            # pos_1 += sum(positive_indices[112896:141120])
+            # pos_2 += sum(positive_indices[141120:148176])
+            # pos_3 += sum(positive_indices[148176:149940])
+            # pos_4 += sum(positive_indices[149940:])
 
             # mean = [0.485, 0.456, 0.406]
             # std = [0.229, 0.224, 0.225]
@@ -170,7 +187,14 @@ def anchor_targets_bbox(
             labels_batch[index, indices, -1] = -1
             properties_batch[index, indices, -1] = -1
             regression_batch[index, indices, -1] = -1
-
+    # print(pos_0)
+    #     # with open('num2.txt', 'a') as f:
+    #     #     f.write(str(pos_0) + '\n')
+    # print(pos_1)
+    # print(pos_2)
+    # print(pos_3)
+    # print(pos_4)
+    # print('_________________________')
     return regression_batch, labels_batch, properties_batch
 
 

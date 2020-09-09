@@ -242,7 +242,8 @@ if __name__ == '__main__':
     classes_dict = {0: 'sand'}
     properties_dict = {0: 'yes', 1: 'no', 2: 'unrecognized'}
 
-    return_elements = ['input_1:0', 'regression_1/concat:0', 'classification_1/concat:0', 'pro/concat:0']
+    # 修改了输入节点名
+    return_elements = ['input_1:0', 'regression_sand/concat:0', 'classification_sand/concat:0', 'pro_sand/concat:0']
     pb_file = 'pbfile/sand.pb'
     wrapper = cr_rpn_wrapper(pb_file, return_elements, score_t=0.1)
 
@@ -265,7 +266,7 @@ if __name__ == '__main__':
     # print(final_pro_id)
     final_boxes = postprocess_boxes(boxes=final_boxes, scale=scale, height=h, width=w)
 
-    final_score_threshold = 0.3
+    final_score_threshold = 0.7
     indices = np.where(final_scores[:] > final_score_threshold)[0]
     final_boxes = final_boxes[indices]
     final_scores = final_scores[indices]

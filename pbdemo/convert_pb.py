@@ -23,7 +23,7 @@ def save_as_pb(model):
 
 
 def main():
-    weight_file_path = '../src/train/checkpoints/2020-08-30/csv_212_1.1373_1.5797.h5'
+    weight_file_path = '../src/train/models/ep25-loss0.1936-val_loss0.9421.h5'
     sand_model, _ = efficientdet_sand(num_anchors=9, num_classes=1, num_properties=3, w_bifpn=64, d_bifpn=3, d_head=3, score_threshold=0.01, nms_threshold=0.5)
     sand_model.load_weights(weight_file_path, by_name=True)
     save_as_pb(sand_model)

@@ -167,6 +167,8 @@ class CSVGenerator(Generator):
         # [('SandCar/images/cug_l_v0_f3400.jpg': [{'x1': 1150, 'y1': 234, 'x2': 1434, 'y2': 505, 'class': 'sand', 'property': 'no'}]),
         # ……,
         # ('SandCar/images/cug_l_v0_f3400.jpg': [{'x1': 1150, 'y1': 234, 'x2': 1434, 'y2': 505, 'class': 'sand', 'property': 'no'}])]
+
+        # {'img_path1':[{'x1':xx,'y1':xx,'x2':xx,'y2':xx,'x3':xx,'y3':xx,'x4':xx,'y4':xx, 'class':xx}...],...}
         for idx, annot in enumerate(self.image_data[path]):
             annotations['labels'] = np.concatenate((annotations['labels'], [self.name_to_label(annot['class'])]))
             annotations['properties'] = np.concatenate((annotations['properties'], [self.name_to_property_id(annot['property'])]))
@@ -242,7 +244,6 @@ def _read_annotations(csv_reader, classes, properties):
             img_file, x1, y1, x2, y2, class_name, property_name = row[:10]
             if img_file not in result:
                 result[img_file] = []
-
             # If a row contains only an image path, it's an image without annotations.
             if (x1, y1, x2, y2, class_name, property_name) == ('', '', '', '', '', ''):
                 continue

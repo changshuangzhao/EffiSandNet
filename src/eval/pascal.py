@@ -69,7 +69,7 @@ class Evaluate(keras.callbacks.Callback):
         logs = logs or {}
 
         # run evaluation
-        average_precisions = evaluate(
+        average_precisions, p, r = evaluate(
             self.generator,
             self.active_model,
             iou_threshold=self.iou_threshold,
@@ -96,13 +96,25 @@ class Evaluate(keras.callbacks.Callback):
             if tf.version.VERSION < '2.0.0' and self.tensorboard.writer is not None:
                 summary = tf.Summary()
                 summary_value = summary.value.add()
+
                 summary_value.simple_value = self.mean_ap
                 summary_value.tag = "mAP"
+
+                summary_value.simple_value = p
+                summary_value.tag = 'Pre'
+
+                summary_value.simple_value = r
+                summary_value.tag = 'Rec'
+
                 self.tensorboard.writer.add_summary(summary, epoch)
             else:
                 tf.summary.scalar('mAP', self.mean_ap, epoch)
+                tf.summary.scalar('Pre', p, epoch)
+                tf.summary.scalar('Rec', r, epoch)
 
         logs['mAP'] = self.mean_ap
 
         if self.verbose == 1:
             print('mAP: {:.4f}'.format(self.mean_ap))
+            print('Pre: {:.4f}'.format(p))
+            print('Rec: {:.4f}'.format(r))
